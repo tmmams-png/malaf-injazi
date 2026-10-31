@@ -137,6 +137,9 @@ ol.steps{list-style:arabic-indic;margin:0;padding-inline-start:22px;display:flex
 
 
 /* guide */
+.linkbtn{appearance:none;border:0;background:none;cursor:pointer;font:700 16px var(--body);color:var(--green);text-decoration:underline;text-underline-offset:4px;padding:4px}
+.linkbtn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
 .btn.big{width:100%;font-size:22px;padding:16px 22px}
 .prog{display:flex;flex-direction:column;gap:10px}
 .prog-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -363,7 +366,10 @@ ul.rules li::before{background:var(--teal)}
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>أكّد تسجيلك عبر واتساب</a>
       <div class="actions">
         <button class="btn green" type="button" id="dl-pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>دليل الطالب (PDF)</button>
-        <button class="btn ghost" type="button" id="dl-mine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M9 14h6M9 18h4"/></svg>نسختي ببياناتي وإجاباتي</button>
+        <a class="btn ghost" id="send-mine" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>أرسل نسختي للموجه الطلابي</a>
+      </div>
+      <p class="note">تصل نسختك (بياناتك وإجابات التأمل الذاتي وتقدّمك في قائمة المراجعة) إلى الموجه الطلابي عبر واتساب. اكتب إجاباتك في القسم ٤ أولًا ثم أرسل.</p>
+      <div class="actions"><button class="linkbtn" type="button" id="dl-mine">أو احفظ نسختي على جهازي</button>
       </div>
       <div class="status" id="dl-status" aria-live="polite"></div>
     </section>
@@ -494,6 +500,24 @@ var GUIDE_PDF="JVBERi0xLjQKJcK1wrYKJSBXcml0dGVuIGJ5IE11UERGIDEuMjguNQoKMSAwIG9ia
     offer('Malaf-Injazi-Student-Guide.pdf',new Blob([u],{type:'application/pdf'}),'تم حفظ دليل الطالب.');
   });
   document.getElementById('dl-mine').addEventListener('click',function(){offer('Malaf-Injazi-My-Copy.html',buildMine(),'تم حفظ نسختك. افتحها بالمتصفح ويمكنك طباعتها.')});
+  var COUNSELOR='966505125104';
+  function mineText(){
+    var r=reg||{name:'',phone:'',stage:'',section:''};
+    var n=G.checklist.length,done=[];for(var i=0;i<n;i++)if(checks[i])done.push(G.checklist[i]);
+    var s='نسختي في مسابقة «ملف إنجازي.. بصمتي وتميّزي»\n\n';
+    s+='الاسم: '+r.name+'\nالجوال: '+r.phone+'\nالصف: '+r.stage+'\nالشعبة: '+r.section+'\n\n';
+    s+='التأمل الذاتي:\n';
+    G.reflect.forEach(function(q,i){s+='• '+q+'\n'+((reflect[i]||'').trim()||'(لم أُجب بعد)')+'\n\n'});
+    s+='قائمة المراجعة: أنجزت '+done.length+' من '+n+'\n';
+    done.forEach(function(c){s+='✓ '+c+'\n'});
+    return s;
+  }
+  var sendMine=document.getElementById('send-mine');
+  function refreshSend(){sendMine.href='https://wa.me/'+COUNSELOR+'?text='+encodeURIComponent(mineText())}
+  sendMine.addEventListener('click',refreshSend);
+  sendMine.addEventListener('pointerdown',refreshSend);
+  sendMine.addEventListener('focus',refreshSend);
+  refreshSend();
 
   function buildMine(){
     var r=reg||{name:'',stage:'',section:''};
